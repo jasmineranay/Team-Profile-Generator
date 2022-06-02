@@ -56,7 +56,7 @@ function addMoreEmployees(){
         {
             type:"list",
             name: "whatToDO",
-            message: "What is the team manager's office number?",
+            message: "Do you want to add more employees?",
             choices: ["New Engineer", "New Intern", "Exit"]
 
         }
@@ -98,13 +98,48 @@ function addEngineer(){
         },
     ]) .then((answers) => {
         const engineer = new Engineer(answers.engineerName. answers.engineerID, answers.engineerEmail, answers.engineerGitHub);
-        engineer = new Manager(
+        engineer = new Engineer(
             answers.engineerName,
             answers.engineerID,
             answers.engineerEmail,
             answers.engineerGitHub
         );
         employeeArr.push(engineer)
+        addMoreEmployees()
+
+    });
+}
+
+function addIntern(){
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "internName",
+            message: "What is the intern's name?"
+        },
+        {
+            type: "input",
+            name: "internID",
+            message: "What is the intern's ID?"
+        },
+        {
+            type: "input",
+            name: "internEmail",
+            message: "What is the intern's email?"
+        }, {
+            type: "input",
+            name: "internGitHub",
+            message: "What is the intern's GitHub?"
+        },
+    ]) .then((answers) => {
+        const intern = new Intern(answers.engineerName. answers.engineerID, answers.engineerEmail, answers.engineerGitHub);
+        intern = new Intern(
+            answers.internName,
+            answers.internID,
+            answers.internEmail,
+            answers.internGitHub
+        );
+        employeeArr.push(intern)
         addMoreEmployees()
 
     });
