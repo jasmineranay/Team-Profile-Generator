@@ -1,185 +1,270 @@
-const Manager = require("./Manager");
-const inquirer = require("inquirer");
-const fs = require("fs");
+const inquirer = require('inquirer');
+const fs = require('fs');
+const Employee = require('./lib/Employee')
+const Engineer = require('./lib/Engineer')
+const Manager = require('./lib/Manager')
+const Intern = require('./lib/intern')
+const path = require('path');
+const DIST_DIR = path.resolve(__dirname, 'dist');
+const distPath = path.join(DIST_DIR, 'index.html');
+const cardGen = require('./src/cardTemplates.js');
+const allEmployees = [];
+const allIDs = [];
 
-function init() {
-    createManager();
 
-}
+const managerQuestions = [
+    {
+        type: 'input',
+        name: 'name',
+        message: `Enter Manager's Name`,
+        // default: 'brian',
+        validate: (answer) => {
+            if (answer !== '') {
+                return true;
+            }
+            return 'Please enter at least one character.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'id',
+        message: `Enter Manager's ID Number`,
+        // default: '007',
+        validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+                return true;
+            }
+            return 'Please enter a positive number greater than zero.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'email',
+        message: `Enter the Manager's Email Address`,
+        validate: (answer) => {
+            const pass = answer.match(/\S+@\S+\.\S+/);
+            if (pass) {
+                return true;
+            }
+            return 'Please enter a valid email address.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'officeNumber',
+        message: `Enter the Manager's Office Number`,
+        validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+                return true;
+            }
+            return 'Please enter a positive number greater than zero.';
+        },
+    },
+]
 
-init()
 
-var employeeArr = [];
+const engineerQuestions = [
+    {
+        type: 'input',
+        name: 'name',
+        message: `Enter Engineer's Name`,
+        validate: (answer) => {
+            if (answer !== '') {
+                return true;
+            }
+            return 'Please enter at least one character.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'id',
+        message: `Enter the Engineer's ID Number`,
+        validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+                if (allIDs.includes(answer)) {
+                    return 'This ID is already taken. Please enter a different number.';
+                } else {
+                    return true;
+                }
+            }
+            return 'Please enter a positive number greater than zero.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'email',
+        message: `Enter the Engineer's Email Address`,
+        validate: (answer) => {
+            const pass = answer.match(/\S+@\S+\.\S+/);
+            if (pass) {
+                return true;
+            }
+            return 'Please enter a valid email address.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'github',
+        message: `Enter Engineer's Github Username`,
+        validate: (answer) => {
+            if (answer !== '') {
+                return true;
+            }
+            return 'Please enter at least one character.';
+        },
+    },
+]
 
-function createManager(){
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "managerName",
-            message: "What is the team manager's name?",
+
+const internQuestions = [
+    {
+        type: 'input',
+        name: 'name',
+        message: `Enter Intern's Name`,
+      
+        validate: (answer) => {
+            if (answer !== '') {
+                return true;
+            }
+            return 'Please enter at least one character.';
+        },
+    },
+    {
+        type: 'input',
+        name: 'id',
+        message: `Enter the Intern's ID Number`,
+        validate: (answer) => {
+            const pass = answer.match(/^[1-9]\d*$/);
+            if (pass) {
+                if (allIDs.includes(answer)) {
+                    return 'This ID is already taken. Please enter a different number.';
+                } else {
+                    return true;
+                }
+            }
+            return 'Please enter a positive number greater than zero.';
+        },
 
     },
     {
-        type: "input",
-        name: "managerId",
-        message: "What is the team manager's ID?",
-
-},
-{
-    type: "input",
-    name: "managerEmail",
-    message: "What is the team manager's email?",
-
-},
-{
-    type: "input",
-    name: "managerofficeNum",
-    message: "What is the team manager's office number?",
-
-},
-
-]) 
-.then ((answers) => {
-    const manager = new Manager(
-        answers.managerName,
-        answers.managerId,
-        answers.managerEmail,
-        answers.managerofficeNum
-    );
-    employeeArr.push(manager)
-    addMoreEmployees()
-
-});
-}
-function addMoreEmployees(){
-    inquirer.prompt([
-        {
-            type:"list",
-            name: "whatToDO",
-            message: "Do you want to add more employees?",
-            choices: ["New Engineer", "New Intern", "Exit"]
-
-        }
-
-    ]) .then ((answer) => {
-        switch(answer.whatTodDO) {
-            case "New Engineer":
-                addEngineer();
-            break;
-            case "New Intern":
-                addIntern();
-            break
-            default:
-                exit()
-        }
-    })
-}
-
-function addEngineer(){
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "engineerName",
-            message: "What is the engineer's name?"
+        type: 'input',
+        name: 'email',
+        message: `Enter the Intern's Email Address`,
+        validate: (answer) => {
+            const pass = answer.match(/\S+@\S+\.\S+/);
+            if (pass) {
+                return true;
+            }
+            return 'Please enter a valid email address.';
         },
-        {
-            type: "input",
-            name: "engineerID",
-            message: "What is the engineer's ID?"
+
+    },
+    {
+        type: 'input',
+        name: 'school',
+        message: `Enter Intern's School Name`,
+        validate: (answer) => {
+            if (answer !== '') {
+                return true;
+            }
+            return 'Please enter at least one character.';
         },
-        {
-            type: "input",
-            name: "engineerEmail",
-            message: "What is the engineer's email?"
-        }, {
-            type: "input",
-            name: "engineerGitHub",
-            message: "What is the engineer's GitHub?"
-        },
-    ]) .then((answers) => {
-        const engineer = new Engineer(answers.engineerName. answers.engineerID, answers.engineerEmail, answers.engineerGitHub);
-        engineer = new Engineer(
-            answers.engineerName,
-            answers.engineerID,
-            answers.engineerEmail,
-            answers.engineerGitHub
-        );
-        employeeArr.push(engineer)
-        addMoreEmployees()
+    },
+]
 
-    });
-}
-
-function addIntern(){
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "internName",
-            message: "What is the intern's name?"
-        },
-        {
-            type: "input",
-            name: "internID",
-            message: "What is the intern's ID?"
-        },
-        {
-            type: "input",
-            name: "internEmail",
-            message: "What is the intern's email?"
-        }, {
-            type: "input",
-            name: "internGitHub",
-            message: "What is the intern's GitHub?"
-        },
-    ]) .then((answers) => {
-        const intern = new Intern(answers.engineerName. answers.engineerID, answers.engineerEmail, answers.engineerGitHub);
-        intern = new Intern(
-            answers.internName,
-            answers.internID,
-            answers.internEmail,
-            answers.internGitHub
-        );
-        employeeArr.push(intern)
-        addMoreEmployees()
-
-    });
-}
-
-function createCard(employee) {
-    console.log(employee)
-    // if(employee.role === "Manager") {
-    //     let extraProperty = employee.managerofficeNum
-    // }
-    return `
-    <div class="card">
-    <h3>${employee.name}</h3>
-    <h4>${employee.role}<h4>
-
-    <p>${employee.id}</p>
-    <p>${employee.email}</p>
-    <p>${employee.officeNumber || employee.GitHub || employee.school}</p>
+const choiceQuestion = [
+    {
+        type: 'list',
+        message: 'What would you like to do next?',
+        name: 'choice',
+        choices: ['Add a new Engineer', 'Add a new Intern', 'Exit'],
+        default: ['Add a new Engineer']
+    },
+]
 
 
-    </div>
-
-    `
-}
-
-function createHtml() {
-    return `
+function createManager() {
+    inquirer
+        .prompt(managerQuestions)
+        .then((data) => {
+            // Create a manager with the Class Manager
+            const manager = new Manager(
+                data.name.toUpperCase(),
+                data.id,
+                data.email,
+                data.officeNumber
+            )
     
-    `;
+            allEmployees.push(manager)
+            allIDs.push(data.id)
+            choice()
+        })
 }
-function exit() {
-    var HTML = "";
-    for (var i = 0; i < employeeArr.length; i++) {
-         console.log(i)
-        HTML = createCard(employeeArr[i]);
 
+function createEngineer() {
+    inquirer
+        .prompt(engineerQuestions)
+        .then((data) => 
+            const engineer = new Engineer(
+                data.name.toUpperCase(),
+                data.id,
+                data.email,
+                data.github
+            )
+            allEmployees.push(engineer)
+            allIDs.push(data.id)
+            choice()
+        })
+}
+
+function createIntern() {
+    inquirer
+        .prompt(internQuestions)
+        .then((data) => {
+        
+            const intern = new Intern(
+                data.name.toUpperCase(),
+                data.id,
+                data.email,
+                data.school
+            )
+            allEmployees.push(intern)
+            allIDs.push(data.id)
+            choice()
+        })
+}
+
+function choice() {
+    inquirer
+        .prompt(choiceQuestion)
+        .then((data) => {
+            console.log(data)
+            switch (data.choice) {
+                case 'Add a new Engineer':
+                    createEngineer()
+                    break;
+                case 'Add a new Intern':
+                    createIntern()
+                    break;
+                default:
+                    console.log(`All Employees Entered... Generating Web Page...`)
+                    cards();
+                    break;
+            }
+        })
+}
+function init() {
+    createManager();
+}
+
+function cards() {
+    if (!fs.existsSync(DIST_DIR)) {
+        fs.mkdirSync(DIST_DIR);
     }
-    fs.writeFile("./READ.html", HTML, function(err){
-        console.log(err)
-        console.log ("Your employee has been created!")
-    })
+    fs.writeFileSync(distPath, cardGen(allEmployees));
 }
 
+init();
